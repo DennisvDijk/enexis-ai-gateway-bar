@@ -22,7 +22,8 @@ Note: "unavailable" model detection needs `background_health_checks` on the prox
 
 ## Tests en CI
 ```sh
-swift test
+swift test        # unit tests (XCTest, needs Xcode)
+swift run UICheck # UI tests: real views, accessibility tree, stub gateway (CLT is enough)
 ```
 - GitHub Actions: `.github/workflows/ci.yml` (test + build bij elke push/PR), `release.yml` (tag `vX.Y.Z` bouwt dmg/zip).
 - GitLab: `.gitlab-ci.yml` (macOS-runner vereist; tag via `MACOS_RUNNER_TAG`).

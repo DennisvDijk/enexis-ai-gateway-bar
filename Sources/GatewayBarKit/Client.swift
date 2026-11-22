@@ -10,7 +10,7 @@ struct APIError: Error, CustomStringConvertible {
 struct GatewayClient {
     let baseURL: URL
     let key: String
-    private static let session: URLSession = {
+    nonisolated(unsafe) static var session: URLSession = {
         let c = URLSessionConfiguration.ephemeral
         c.timeoutIntervalForRequest = 15
         return URLSession(configuration: c)

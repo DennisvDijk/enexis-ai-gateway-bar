@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import GatewayBar
+@testable import GatewayBarKit
 
 final class BudgetTests: XCTestCase {
     func testFractionIsSpendOverMax() {

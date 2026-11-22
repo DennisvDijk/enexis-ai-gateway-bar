@@ -34,8 +34,9 @@ struct BudgetInfo {
 struct TeamInfo { var name: String; var spend: Double; var max: Double?; var duration: String?; var resetAt: Date? }
 
 @MainActor
-final class Store: ObservableObject {
-    static let shared = Store()
+public final class Store: ObservableObject {
+    public static let shared = Store()
+    public init() {}
     @AppStorage("barStyle") var barStyle = "amount"   // amount | percent | both | icon
     @AppStorage("baseURL") var baseURLString = "http://localhost:4000"
     @AppStorage("interval") var interval = 60.0
@@ -66,7 +67,7 @@ final class Store: ObservableObject {
 
     func saveKey(_ k: String) { apiKey = k; Keychain.set(k) }
 
-    func start() {
+    public func start() {
         guard !started else { return }
         started = true
         if Bundle.main.bundleIdentifier != nil { UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in } }
@@ -83,7 +84,7 @@ final class Store: ObservableObject {
         }
     }
 
-    var title: String {
+    public var title: String {
         if health == .authError { return "key?" }
         if health == .down { return "offline" }
         let amount = budget?.spend ?? spendToday
@@ -117,7 +118,7 @@ final class Store: ObservableObject {
         case .unknown: return lastError ?? "Nog niet ingesteld"
         }
     }
-    var badge: Color? { health == .unknown ? nil : tint }
+    public var badge: Color? { health == .unknown ? nil : tint }
     var tint: Color {
         switch health { case .ok: return .green; case .degraded: return .orange; case .down, .authError: return .red; case .unknown: return .gray }
     }

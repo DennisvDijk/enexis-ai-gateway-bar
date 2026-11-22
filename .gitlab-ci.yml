@@ -23,6 +23,7 @@ test:
   script:
     - swift --version
     - swift test
+    - swift run UICheck
     - ./build.sh
     - codesign --verify --verbose GatewayBar.app
   artifacts:

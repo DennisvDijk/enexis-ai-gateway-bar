@@ -6,7 +6,7 @@
 #        SIGN_IDENTITY="Developer ID Application: ..."  -> hardened-runtime signing (else ad hoc)
 set -euo pipefail
 cd "${0:A:h}"
-swift build -c release
+swift build -c release --product GatewayBar
 BIN="$(swift build -c release --show-bin-path)/GatewayBar"
 APP=GatewayBar.app
 VERSION="${VERSION:-1.0.0}"

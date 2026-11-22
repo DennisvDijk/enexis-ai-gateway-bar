@@ -3,10 +3,11 @@ import ServiceManagement
 
 // MARK: - Popover
 
-struct MenuView: View {
+public struct MenuView: View {
     @ObservedObject var s: Store
+    public init(s: Store) { self.s = s }
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
             heroCard
@@ -22,15 +23,15 @@ struct MenuView: View {
         HStack(spacing: 10) {
             EnexisMark().frame(width: 30, height: 30)
             VStack(alignment: .leading, spacing: 1) {
-                Text("Enexis AI Gateway").font(.system(size: 14, weight: .bold))
+                Text("Enexis AI Gateway").font(.system(size: 14, weight: .bold)).accessibilityIdentifier("title")
                 HStack(spacing: 5) {
                     Circle().fill(s.tint).frame(width: 6, height: 6)
-                    Text(s.statusLine).font(.system(size: 11.5)).foregroundStyle(.secondary).lineLimit(1)
+                    Text(s.statusLine).font(.system(size: 11.5)).foregroundStyle(.secondary).lineLimit(1).accessibilityIdentifier("statusLine")
                 }
             }
             Spacer()
             if s.refreshing { ProgressView().controlSize(.mini) }
-            else { IconButton(name: "arrow.clockwise", label: "Vernieuw") { Task { await s.refresh() } } }
+            else { IconButton(name: "arrow.clockwise", label: "Vernieuw", id: "refresh") { Task { await s.refresh() } } }
         }
     }
 
@@ -59,12 +60,12 @@ struct MenuView: View {
     func heroMessage(_ title: String, _ sub: String, settings: Bool) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Spacer()
-            Text(title).font(.system(size: 22, weight: .bold, design: .rounded)).foregroundStyle(.white)
+            Text(title).font(.system(size: 22, weight: .bold, design: .rounded)).foregroundStyle(.white).accessibilityIdentifier("heroMessage")
             Text(sub).font(.system(size: 12)).foregroundStyle(.white.opacity(0.8))
             if settings {
                 Button(action: { SettingsWindow.show(s) }) { Text("Open instellingen").font(.system(size: 12, weight: .semibold)).foregroundStyle(.white)
                     .padding(.horizontal, 14).padding(.vertical, 7).background(Capsule().fill(.white.opacity(0.22))).contentShape(Capsule()) }
-                    .buttonStyle(.plain).padding(.top, 6)
+                    .buttonStyle(.plain).padding(.top, 6).accessibilityIdentifier("openSettings")
             }
         }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -72,9 +73,9 @@ struct MenuView: View {
     var heroNumbers: some View {
         let amount = s.budget?.spend ?? s.spendToday ?? 0
         return VStack(alignment: .leading, spacing: 0) {
-            Text(s.budget?.period.map { "VERBRUIK · " + $0.uppercased() } ?? (s.budget != nil ? "VERBRUIK" : "VANDAAG")).font(.system(size: 10, weight: .semibold)).tracking(1).foregroundStyle(.white.opacity(0.7))
-            Text(money(amount)).font(.system(size: 40, weight: .bold, design: .rounded)).monospacedDigit().foregroundStyle(.white)
-            Text(s.budget.map(sub) ?? "").font(.system(size: 11.5)).foregroundStyle(.white.opacity(0.8))
+            Text(s.budget?.period.map { "VERBRUIK · " + $0.uppercased() } ?? (s.budget != nil ? "VERBRUIK" : "VANDAAG")).font(.system(size: 10, weight: .semibold)).tracking(1).foregroundStyle(.white.opacity(0.7)).accessibilityIdentifier("heroPeriod")
+            Text(money(amount)).font(.system(size: 40, weight: .bold, design: .rounded)).monospacedDigit().foregroundStyle(.white).accessibilityIdentifier("heroAmount")
+            Text(s.budget.map(sub) ?? "").font(.system(size: 11.5)).foregroundStyle(.white.opacity(0.8)).accessibilityIdentifier("heroSub")
             Spacer(minLength: 6)
             if let f = s.budget?.fraction {
                 HStack(spacing: 8) {
@@ -84,7 +85,7 @@ struct MenuView: View {
                             Capsule().fill(f >= 1 ? Color.red : f >= s.alertAt ? Color.orange : Brand.green).frame(width: max(6, g.size.width * min(f, 1)))
                         }
                     }.frame(height: 6)
-                    Text("\(Int(f * 100))%").font(.system(size: 11, weight: .semibold)).monospacedDigit().foregroundStyle(.white)
+                    Text("\(Int(f * 100))%").font(.system(size: 11, weight: .semibold)).monospacedDigit().foregroundStyle(.white).accessibilityIdentifier("budgetPercent")
                 }
             } else if s.history.count > 2 {
                 Sparkline(values: s.history, color: .white).frame(height: 18)
@@ -138,6 +139,8 @@ struct MenuView: View {
                                 Text(money(m.spendToday)).font(.system(size: 12)).monospacedDigit().foregroundStyle(.secondary)
                             }
                         }.padding(.vertical, 7).padding(.horizontal, 12)
+                        .accessibilityElement(children: .combine).accessibilityIdentifier("model-\(m.id)")
+                        .accessibilityLabel("\(m.id), \(m.available ? "beschikbaar" : "niet beschikbaar")")
                         if m.id != list.last?.id { Divider().opacity(0.5).padding(.leading, 12) }
                     }
                 }
@@ -145,7 +148,7 @@ struct MenuView: View {
             }
             if all.count > 5 {
                 Button(s.showAll ? "Minder" : "\(all.count - 5) meer") { s.showAll.toggle() }
-                    .buttonStyle(.plain).font(.system(size: 11.5, weight: .semibold)).foregroundStyle(Brand.pink).contentShape(Rectangle())
+                    .buttonStyle(.plain).font(.system(size: 11.5, weight: .semibold)).foregroundStyle(Brand.pink).contentShape(Rectangle()).accessibilityIdentifier("toggleModels")
             }
         }
     }
@@ -153,10 +156,10 @@ struct MenuView: View {
     var footer: some View {
         HStack(spacing: 4) {
             Text(s.lastUpdate.map { "Bijgewerkt " + $0.formatted(date: .omitted, time: .shortened) } ?? "Nog niet bijgewerkt")
-                .font(.system(size: 11)).foregroundStyle(.tertiary)
+                .font(.system(size: 11)).foregroundStyle(.tertiary).accessibilityIdentifier("lastUpdate")
             Spacer()
-            IconButton(name: "gearshape", label: "Instellingen") { SettingsWindow.show(s) }
-            IconButton(name: "power", label: "Afsluiten") { NSApp.terminate(nil) }
+            IconButton(name: "gearshape", label: "Instellingen", id: "settings") { SettingsWindow.show(s) }
+            IconButton(name: "power", label: "Afsluiten", id: "quit") { NSApp.terminate(nil) }
         }
     }
 }
@@ -168,18 +171,19 @@ func money(_ v: Double) -> String { v >= 1000 ? String(format: "$%.0f", v) : Str
 struct IconButton: View {
     let name: String
     var label: String = ""
+    var id: String = ""
     let action: () -> Void
     var body: some View {
         Button(action: action) {
             Image(systemName: name).font(.system(size: 13)).foregroundStyle(.secondary)
                 .frame(width: 30, height: 30).contentShape(Rectangle())
-        }.buttonStyle(.plain).help(label).accessibilityLabel(label)
+        }.buttonStyle(.plain).help(label).accessibilityLabel(label).accessibilityIdentifier(id)
     }
 }
 
-@MainActor enum DashboardWindow {
+@MainActor public enum DashboardWindow {
     private static var window: NSWindow?
-    static func show(_ s: Store) {
+    public static func show(_ s: Store) {
         if window == nil {
             let w = NSWindow(contentRect: .zero, styleMask: [.titled, .closable], backing: .buffered, defer: false)
             w.title = "Enexis AI Gateway"
@@ -195,7 +199,7 @@ struct IconButton: View {
 
 /// Own settings window: SettingsLink / showSettingsWindow are unreliable from a menu bar popover of an accessory app.
 @MainActor enum SettingsWindow {
-    private static var window: NSWindow?
+    static var window: NSWindow?
     static func show(_ s: Store) {
         if window == nil {
             let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 420, height: 560),
@@ -219,6 +223,7 @@ struct Tile: View {
             Text(label).font(.system(size: 10.5)).foregroundStyle(.secondary).lineLimit(1)
             Text(value).font(.system(size: 14, weight: .semibold, design: .rounded)).monospacedDigit()
         }
+        .accessibilityElement(children: .combine).accessibilityIdentifier("tile-\(label)")
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 10).padding(.vertical, 8)
         .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.primary.opacity(0.05)))
@@ -262,8 +267,8 @@ struct SettingsView: View {
                 HStack(spacing: 10) { EnexisMark().frame(width: 28, height: 28); Text("Enexis AI Gateway").font(.system(size: 15, weight: .bold)) }
             }
             Section("Verbinding") {
-                TextField("URL", text: $s.baseURLString, prompt: Text("https://gateway.example.com"))
-                SecureField("API key", text: $s.draftKey, prompt: Text("sk-…"))
+                TextField("URL", text: $s.baseURLString, prompt: Text("https://gateway.example.com")).accessibilityIdentifier("urlField")
+                SecureField("API key", text: $s.draftKey, prompt: Text("sk-…")).accessibilityIdentifier("keyField")
             }
             Section("Gedrag") {
                 Picker("Verversen", selection: $s.interval) {
@@ -282,7 +287,7 @@ struct SettingsView: View {
                 }
             }
             Section {
-                Button("Opslaan") { s.saveKey(s.draftKey); s.restart() }.keyboardShortcut(.defaultAction)
+                Button("Opslaan") { s.saveKey(s.draftKey); s.restart() }.keyboardShortcut(.defaultAction).accessibilityIdentifier("save")
             } footer: {
                 Text("De key staat in de Keychain en gaat alleen naar je gateway.").font(.caption)
             }
@@ -320,7 +325,7 @@ struct EnexisMark: View {
     }
 }
 
-@MainActor func menuBarMark(status: Color?) -> NSImage {
+@MainActor public func menuBarMark(status: Color?) -> NSImage {
     let content = ZStack(alignment: .bottomTrailing) {
         EnexisMark().frame(width: 18, height: 18)
         if let c = status {

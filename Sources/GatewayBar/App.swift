@@ -1,4 +1,5 @@
 import SwiftUI
+import GatewayBarKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Opening the app again (Finder, Spotlight) shows the dashboard in a normal window,
