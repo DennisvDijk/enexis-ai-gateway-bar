@@ -33,3 +33,13 @@ flowchart LR
   B -->|model uit| F[Waarschuwing]
   B -->|budget > drempel| F
 ```
+
+## Wat is getest en wat niet
+| Functie | Status |
+|---|---|
+| Weergave van alle statussen, knoppen, instellingen | UI-tests (CI) |
+| Budget, percentage, teambudget-terugval | UI- en unit tests |
+| Meldingen (budget 80%/100%, model erbij/weg/uit/terug) | Logica aanwezig, **niet getest**; verstuurt alleen vanuit een echte `.app` met bundle-id |
+| "Start bij inloggen" | Code aanwezig, niet getest |
+| Echte Enexis-gateway | Nog nooit gedraaid |
+| Echte muisklik in de menubalk | Niet geautomatiseerd |

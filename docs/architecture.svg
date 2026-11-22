@@ -11,7 +11,7 @@
   </g>
   <rect x="280" y="30" width="220" height="5" fill="#DF0073"/>
   <g fill="#222">
-    <text x="36" y="56" font-weight="600">Menu bar app (GatewayBar)</text>
+    <text x="36" y="56" font-weight="600">Menu bar app</text>
     <text x="36" y="82">Menu bar icon + title</text>
     <text x="36" y="102">Popover (MenuView)</text>
     <text x="36" y="122">Dashboard window</text>
@@ -21,7 +21,7 @@
     <text x="296" y="106">Client: HTTP + Bearer key</text>
     <text x="296" y="126">Views: SwiftUI</text>
     <text x="296" y="146">Keychain: API key</text>
-    <text x="576" y="56" font-weight="600">AI Gateway (LiteLLM)</text>
+    <text x="576" y="56" font-weight="600">AI Gateway</text>
     <text x="576" y="82">/v1/models</text>
     <text x="576" y="102">/health/liveliness</text>
     <text x="576" y="122">/key/info, /team/info</text>
@@ -37,15 +37,15 @@
     <path d="M220 105H278"/>
     <path d="M500 105H558"/>
     <path d="M390 240V182" stroke-dasharray="4 3"/>
-    <path d="M278 275H222"/>
-    <path d="M502 275H558"/>
+    <path d="M310 180L130 238"/>
+    <path d="M470 180L650 238"/>
   </g>
   <g fill="#635D63" font-size="11">
     <text x="226" y="98">draws</text>
-    <text x="506" y="98">every 60 s</text>
+    <text x="503" y="96" font-size="10">60 s</text>
     <text x="398" y="215">tests the same code</text>
-    <text x="232" y="268">reads</text>
-    <text x="508" y="268">stores</text>
+    <text x="190" y="205">reads</text>
+    <text x="540" y="205">stores, notifies</text>
   </g>
   <text x="20" y="390" fill="#635D63" font-size="12">CI (GitHub Actions / GitLab): swift test, swift run UICheck, build.sh, sign, release</text>
 </svg>
