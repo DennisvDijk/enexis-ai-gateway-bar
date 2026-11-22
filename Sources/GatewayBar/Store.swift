@@ -19,10 +19,19 @@ struct BudgetInfo {
     var alias: String?
     var rpm: Double?
     var tpm: Double?
+    var period: String? {
+        guard let d = duration?.lowercased(), !d.isEmpty else { return nil }
+        switch d {
+        case "1d", "24h": return "dagelijks"
+        case "7d", "1w", "168h": return "wekelijks"
+        case "30d", "1mo", "720h": return "maandelijks"
+        default: return d
+        }
+    }
     var fraction: Double? { maxBudget.flatMap { $0 > 0 ? spend / $0 : nil } }
 }
 
-struct TeamInfo { var name: String; var spend: Double; var max: Double? }
+struct TeamInfo { var name: String; var spend: Double; var max: Double?; var duration: String?; var resetAt: Date? }
 
 @MainActor
 final class Store: ObservableObject {
@@ -148,7 +157,14 @@ final class Store: ObservableObject {
                 checkBudget(b)
                 if let tid = i["team_id"] as? String, let tj = try? await c.get("team/info", query: ["team_id": tid]) as? [String: Any],
                    let ti = tj["team_info"] as? [String: Any] {
-                    team = TeamInfo(name: ti["team_alias"] as? String ?? tid, spend: num(ti["spend"]) ?? 0, max: num(ti["max_budget"]))
+                    let t = TeamInfo(name: ti["team_alias"] as? String ?? tid, spend: num(ti["spend"]) ?? 0, max: num(ti["max_budget"]),
+                                     duration: ti["budget_duration"] as? String, resetAt: parseDate(ti["budget_reset_at"] as? String))
+                    team = t
+                    // No budget on the key itself: use the team's budget (spend, limit and period)
+                    if b.maxBudget == nil, let m = t.max {
+                        let tb = BudgetInfo(spend: t.spend, maxBudget: m, resetAt: t.resetAt, duration: t.duration, alias: b.alias, rpm: b.rpm, tpm: b.tpm)
+                        budget = tb; checkBudget(tb)
+                    }
                 }
             }
         } catch let e as APIError where e.status == 401 || e.status == 403 { authFailed = true }

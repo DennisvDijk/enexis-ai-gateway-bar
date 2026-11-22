@@ -72,7 +72,7 @@ struct MenuView: View {
     var heroNumbers: some View {
         let amount = s.budget?.spend ?? s.spendToday ?? 0
         return VStack(alignment: .leading, spacing: 0) {
-            Text(s.budget != nil ? "VERBRUIK" : "VANDAAG").font(.system(size: 10, weight: .semibold)).tracking(1).foregroundStyle(.white.opacity(0.7))
+            Text(s.budget?.period.map { "VERBRUIK · " + $0.uppercased() } ?? (s.budget != nil ? "VERBRUIK" : "VANDAAG")).font(.system(size: 10, weight: .semibold)).tracking(1).foregroundStyle(.white.opacity(0.7))
             Text(money(amount)).font(.system(size: 40, weight: .bold, design: .rounded)).monospacedDigit().foregroundStyle(.white)
             Text(s.budget.map(sub) ?? "").font(.system(size: 11.5)).foregroundStyle(.white.opacity(0.8))
             Spacer(minLength: 6)
@@ -94,7 +94,7 @@ struct MenuView: View {
 
     func sub(_ b: BudgetInfo) -> String {
         var parts: [String] = []
-        if let m = b.maxBudget { parts.append("van \(money(m))") }
+        if let m = b.maxBudget { parts.append("van \(money(m))" + (b.period.map { " \($0)" } ?? "")) }
         if let r = b.resetAt { parts.append("reset " + r.formatted(.relative(presentation: .named))) }
         return parts.joined(separator: " · ")
     }
