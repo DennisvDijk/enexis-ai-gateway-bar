@@ -30,7 +30,7 @@ struct MenuView: View {
             }
             Spacer()
             if s.refreshing { ProgressView().controlSize(.mini) }
-            else { IconButton(name: "arrow.clockwise") { Task { await s.refresh() } } }
+            else { IconButton(name: "arrow.clockwise", label: "Vernieuw") { Task { await s.refresh() } } }
         }
     }
 
@@ -62,8 +62,8 @@ struct MenuView: View {
             Text(title).font(.system(size: 22, weight: .bold, design: .rounded)).foregroundStyle(.white)
             Text(sub).font(.system(size: 12)).foregroundStyle(.white.opacity(0.8))
             if settings {
-                SettingsLink { Text("Open instellingen").font(.system(size: 12, weight: .semibold)).foregroundStyle(.white)
-                    .padding(.horizontal, 12).padding(.vertical, 5).background(Capsule().fill(.white.opacity(0.22))) }
+                Button(action: { SettingsWindow.show(s) }) { Text("Open instellingen").font(.system(size: 12, weight: .semibold)).foregroundStyle(.white)
+                    .padding(.horizontal, 14).padding(.vertical, 7).background(Capsule().fill(.white.opacity(0.22))).contentShape(Capsule()) }
                     .buttonStyle(.plain).padding(.top, 6)
             }
         }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
@@ -145,18 +145,18 @@ struct MenuView: View {
             }
             if all.count > 5 {
                 Button(s.showAll ? "Minder" : "\(all.count - 5) meer") { s.showAll.toggle() }
-                    .buttonStyle(.plain).font(.system(size: 11.5, weight: .semibold)).foregroundStyle(Brand.pink)
+                    .buttonStyle(.plain).font(.system(size: 11.5, weight: .semibold)).foregroundStyle(Brand.pink).contentShape(Rectangle())
             }
         }
     }
 
     var footer: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 4) {
             Text(s.lastUpdate.map { "Bijgewerkt " + $0.formatted(date: .omitted, time: .shortened) } ?? "Nog niet bijgewerkt")
                 .font(.system(size: 11)).foregroundStyle(.tertiary)
             Spacer()
-            SettingsLink { Image(systemName: "gearshape").font(.system(size: 12)).foregroundStyle(.secondary) }.buttonStyle(.plain)
-            IconButton(name: "power") { NSApp.terminate(nil) }
+            IconButton(name: "gearshape", label: "Instellingen") { SettingsWindow.show(s) }
+            IconButton(name: "power", label: "Afsluiten") { NSApp.terminate(nil) }
         }
     }
 }
@@ -167,9 +167,47 @@ func money(_ v: Double) -> String { v >= 1000 ? String(format: "$%.0f", v) : Str
 
 struct IconButton: View {
     let name: String
+    var label: String = ""
     let action: () -> Void
     var body: some View {
-        Button(action: action) { Image(systemName: name).font(.system(size: 12)).foregroundStyle(.secondary) }.buttonStyle(.plain)
+        Button(action: action) {
+            Image(systemName: name).font(.system(size: 13)).foregroundStyle(.secondary)
+                .frame(width: 30, height: 30).contentShape(Rectangle())
+        }.buttonStyle(.plain).help(label).accessibilityLabel(label)
+    }
+}
+
+@MainActor enum DashboardWindow {
+    private static var window: NSWindow?
+    static func show(_ s: Store) {
+        if window == nil {
+            let w = NSWindow(contentRect: .zero, styleMask: [.titled, .closable], backing: .buffered, defer: false)
+            w.title = "Enexis AI Gateway"
+            w.contentView = NSHostingView(rootView: MenuView(s: s))
+            w.isReleasedWhenClosed = false
+            w.center()
+            window = w
+        }
+        NSApp.activate(ignoringOtherApps: true)
+        window?.makeKeyAndOrderFront(nil)
+    }
+}
+
+/// Own settings window: SettingsLink / showSettingsWindow are unreliable from a menu bar popover of an accessory app.
+@MainActor enum SettingsWindow {
+    private static var window: NSWindow?
+    static func show(_ s: Store) {
+        if window == nil {
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 420, height: 560),
+                             styleMask: [.titled, .closable], backing: .buffered, defer: false)
+            w.title = "Enexis AI Gateway"
+            w.contentView = NSHostingView(rootView: SettingsView(s: s))
+            w.isReleasedWhenClosed = false
+            w.center()
+            window = w
+        }
+        NSApp.activate(ignoringOtherApps: true)
+        window?.makeKeyAndOrderFront(nil)
     }
 }
 
@@ -234,6 +272,10 @@ struct SettingsView: View {
                 Picker("Waarschuwing bij", selection: $s.alertAt) {
                     Text("50%").tag(0.5); Text("80%").tag(0.8); Text("90%").tag(0.9)
                 }
+                Picker("Menubalk toont", selection: $s.barStyle) {
+                    Text("Bedrag").tag("amount"); Text("Percentage").tag("percent")
+                    Text("Bedrag en %").tag("both"); Text("Alleen icoon").tag("icon")
+                }
                 Toggle("Meldingen", isOn: $s.notify)
                 Toggle("Start bij inloggen", isOn: $s.loginItem).onChange(of: s.loginItem) { _, on in
                     do { if on { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() } } catch {}
@@ -246,7 +288,7 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 420, height: 400)
+        .frame(width: 420, height: 560)
         .onAppear { s.draftKey = s.apiKey; s.loginItem = SMAppService.mainApp.status == .enabled }
     }
 }

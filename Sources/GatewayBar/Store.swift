@@ -35,6 +35,8 @@ struct TeamInfo { var name: String; var spend: Double; var max: Double?; var dur
 
 @MainActor
 final class Store: ObservableObject {
+    static let shared = Store()
+    @AppStorage("barStyle") var barStyle = "amount"   // amount | percent | both | icon
     @AppStorage("baseURL") var baseURLString = "http://localhost:4000"
     @AppStorage("interval") var interval = 60.0
     @AppStorage("alertAt") var alertAt = 0.8
@@ -84,12 +86,16 @@ final class Store: ObservableObject {
     var title: String {
         if health == .authError { return "key?" }
         if health == .down { return "offline" }
-        if let b = budget {
-            if let f = b.fraction { return String(format: "$%.0f · %d%%", b.spend, Int(f * 100)) }
-            return String(format: "$%.2f", b.spend)
+        let amount = budget?.spend ?? spendToday
+        let pct = budget?.fraction.map { "\(Int($0 * 100))%" }
+        switch barStyle {
+        case "icon": return ""
+        case "percent": return pct ?? amount.map { String(format: "$%.0f", $0) } ?? "–"
+        case "both":
+            guard let a = amount else { return "–" }
+            return pct.map { String(format: "$%.0f · ", a) + $0 } ?? String(format: "$%.2f", a)
+        default: return amount.map { $0 >= 100 ? String(format: "$%.0f", $0) : String(format: "$%.2f", $0) } ?? "–"
         }
-        if let t = spendToday { return String(format: "$%.2f", t) }
-        return "–"
     }
     var symbol: String {
         switch health {

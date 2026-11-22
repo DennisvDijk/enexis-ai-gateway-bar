@@ -1,8 +1,18 @@
 import SwiftUI
 
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    /// Opening the app again (Finder, Spotlight) shows the dashboard in a normal window,
+    /// so it stays reachable when the menu bar is too crowded and macOS hides the item.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        Task { @MainActor in DashboardWindow.show(Store.shared) }
+        return true
+    }
+}
+
 @main
 struct GatewayBarApp: App {
-    @StateObject private var store = Store()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
+    @StateObject private var store = Store.shared
     init() { NSApplication.shared.setActivationPolicy(.accessory) }
 
     var body: some Scene {
@@ -15,6 +25,5 @@ struct GatewayBarApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        Settings { SettingsView(s: store) }
     }
 }

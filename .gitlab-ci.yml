@@ -1,0 +1,41 @@
+# GitLab CI for the macOS menu bar app. Needs a macOS runner.
+# GitLab.com: SaaS macOS runners (Premium/Ultimate), tag below. Self-managed: a Mac runner registered with tag `macos`.
+# Override the tag via the CI/CD variable MACOS_RUNNER_TAG.
+
+stages: [test, package]
+
+variables:
+  MACOS_RUNNER_TAG: saas-macos-medium-m1
+
+default:
+  tags: [$MACOS_RUNNER_TAG]
+  image: macos-15-xcode-16
+  interruptible: true
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+test:
+  stage: test
+  script:
+    - swift --version
+    - swift test
+    - ./build.sh
+    - codesign --verify --verbose GatewayBar.app
+  artifacts:
+    paths: [GatewayBar.app]
+    expire_in: 1 week
+
+package:
+  stage: package
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+/
+  script:
+    # Optional: set SIGN_IDENTITY and NOTARY_PROFILE (masked/protected CI variables) for a signed, notarized dmg.
+    - VERSION="${CI_COMMIT_TAG#v}" BUILD_NUMBER="$CI_PIPELINE_IID" ./scripts/package.sh
+  artifacts:
+    paths: [dist/]
+    expire_in: 90 days

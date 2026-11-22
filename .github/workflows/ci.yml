@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Toolchain
+        run: swift --version
+      - name: Test
+        run: swift test
+      - name: Build app bundle
+        run: ./build.sh
+      - name: Verify bundle
+        run: |
+          codesign --verify --verbose GatewayBar.app
+          /usr/libexec/PlistBuddy -c "Print :LSUIElement" GatewayBar.app/Contents/Info.plist
+      - name: Upload app
+        uses: actions/upload-artifact@v7
+        with:
+          name: GatewayBar-app
+          path: GatewayBar.app
+          retention-days: 7

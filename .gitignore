@@ -1,3 +1,4 @@
 .build/
 GatewayBar.app/
+dist/
 .DS_Store
