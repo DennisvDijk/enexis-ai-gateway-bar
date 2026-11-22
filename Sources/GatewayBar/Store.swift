@@ -84,8 +84,10 @@ final class Store: ObservableObject {
     var title: String {
         if health == .authError { return "key?" }
         if health == .down { return "offline" }
-        if health == .degraded { return "⚠︎ " + (budget.map { String(format: "$%.2f", $0.spend) } ?? "") }
-        if let b = budget { return String(format: "$%.2f", b.spend) }
+        if let b = budget {
+            if let f = b.fraction { return String(format: "$%.0f · %d%%", b.spend, Int(f * 100)) }
+            return String(format: "$%.2f", b.spend)
+        }
         if let t = spendToday { return String(format: "$%.2f", t) }
         return "–"
     }
@@ -109,6 +111,7 @@ final class Store: ObservableObject {
         case .unknown: return lastError ?? "Nog niet ingesteld"
         }
     }
+    var badge: Color? { health == .unknown ? nil : tint }
     var tint: Color {
         switch health { case .ok: return .green; case .degraded: return .orange; case .down, .authError: return .red; case .unknown: return .gray }
     }

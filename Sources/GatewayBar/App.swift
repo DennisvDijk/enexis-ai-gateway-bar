@@ -9,7 +9,7 @@ struct GatewayBarApp: App {
         MenuBarExtra {
             MenuView(s: store)
         } label: {
-            Image(nsImage: menuBarMark())
+            Image(nsImage: menuBarMark(status: store.badge))
             Text(store.title).monospacedDigit()
                 .task { store.start() }
         }

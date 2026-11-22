@@ -278,8 +278,16 @@ struct EnexisMark: View {
     }
 }
 
-@MainActor func menuBarMark() -> NSImage {
-    let r = ImageRenderer(content: EnexisMark().frame(width: 18, height: 18))
+@MainActor func menuBarMark(status: Color?) -> NSImage {
+    let content = ZStack(alignment: .bottomTrailing) {
+        EnexisMark().frame(width: 18, height: 18)
+        if let c = status {
+            Circle().fill(c).frame(width: 7, height: 7)
+                .overlay(Circle().stroke(Color.black.opacity(0.55), lineWidth: 1))
+                .offset(x: 2, y: 2)
+        }
+    }.frame(width: 21, height: 20)
+    let r = ImageRenderer(content: content)
     r.scale = 2
     let img = r.nsImage ?? NSImage()
     img.isTemplate = false
