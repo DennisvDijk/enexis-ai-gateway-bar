@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="13">
+  <title>GatewayBar architecture</title>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#635D63"/></marker></defs>
+  <g fill="#fff" stroke="#635D63" stroke-width="1.2">
+    <rect x="20" y="30" width="200" height="150" rx="6"/>
+    <rect x="280" y="30" width="220" height="150" rx="6"/>
+    <rect x="560" y="30" width="180" height="150" rx="6"/>
+    <rect x="280" y="240" width="220" height="70" rx="6"/>
+    <rect x="20" y="240" width="200" height="70" rx="6"/>
+    <rect x="560" y="240" width="180" height="70" rx="6"/>
+  </g>
+  <rect x="280" y="30" width="220" height="5" fill="#DF0073"/>
+  <g fill="#222">
+    <text x="36" y="56" font-weight="600">Menu bar app (GatewayBar)</text>
+    <text x="36" y="82">Menu bar icon + title</text>
+    <text x="36" y="102">Popover (MenuView)</text>
+    <text x="36" y="122">Dashboard window</text>
+    <text x="36" y="142">Settings window</text>
+    <text x="296" y="60" font-weight="600">GatewayBarKit (library)</text>
+    <text x="296" y="86">Store: timer, state, alerts</text>
+    <text x="296" y="106">Client: HTTP + Bearer key</text>
+    <text x="296" y="126">Views: SwiftUI</text>
+    <text x="296" y="146">Keychain: API key</text>
+    <text x="576" y="56" font-weight="600">AI Gateway (LiteLLM)</text>
+    <text x="576" y="82">/v1/models</text>
+    <text x="576" y="102">/health/liveliness</text>
+    <text x="576" y="122">/key/info, /team/info</text>
+    <text x="576" y="142">/spend/logs/v2</text>
+    <text x="296" y="270" font-weight="600">UICheck + unit tests</text>
+    <text x="296" y="292" fill="#635D63">real views, stub gateway</text>
+    <text x="36" y="270" font-weight="600">Settings</text>
+    <text x="36" y="292" fill="#635D63">UserDefaults / MDM profile</text>
+    <text x="576" y="270" font-weight="600">macOS</text>
+    <text x="576" y="292" fill="#635D63">Keychain, notifications</text>
+  </g>
+  <g stroke="#635D63" stroke-width="1.4" fill="none" marker-end="url(#a)">
+    <path d="M220 105H278"/>
+    <path d="M500 105H558"/>
+    <path d="M390 240V182" stroke-dasharray="4 3"/>
+    <path d="M278 275H222"/>
+    <path d="M502 275H558"/>
+  </g>
+  <g fill="#635D63" font-size="11">
+    <text x="226" y="98">draws</text>
+    <text x="506" y="98">every 60 s</text>
+    <text x="398" y="215">tests the same code</text>
+    <text x="232" y="268">reads</text>
+    <text x="508" y="268">stores</text>
+  </g>
+  <text x="20" y="390" fill="#635D63" font-size="12">CI (GitHub Actions / GitLab): swift test, swift run UICheck, build.sh, sign, release</text>
+</svg>

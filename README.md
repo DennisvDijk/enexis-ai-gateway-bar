@@ -28,6 +28,7 @@ swift run UICheck # UI tests: real views, accessibility tree, stub gateway (CLT 
 - GitHub Actions: `.github/workflows/ci.yml` (test + build bij elke push/PR), `release.yml` (tag `vX.Y.Z` bouwt dmg/zip).
 - GitLab: `.gitlab-ci.yml` (macOS-runner vereist; tag via `MACOS_RUNNER_TAG`).
 - Uitrol naar de organisatie: zie [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+- Hoe het werkt: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). How-to's: [docs/HOWTO.md](docs/HOWTO.md).
 
 ## Als het menubalk-icoon niet zichtbaar is
 Bij een volle menubalk (of een menubalk-beheerder zoals Ice/Bartender) kan het icoon verborgen zijn. Open GatewayBar opnieuw (Spotlight/Finder): het dashboard verschijnt dan in een gewoon venster.
