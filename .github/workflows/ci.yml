@@ -20,6 +20,8 @@ jobs:
       - uses: actions/checkout@v7
       - name: Toolchain
         run: swift --version
+      - name: Lint
+        run: ./scripts/lint.sh
       - name: Unit tests
         run: swift test
       - name: UI tests (real views, accessibility tree)

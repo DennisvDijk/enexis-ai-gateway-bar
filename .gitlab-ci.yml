@@ -3,7 +3,7 @@
 # Self-managed GitLab: register a Mac with the shell executor and tag `macos` (see docs/GITLAB.md).
 # GitLab.com SaaS: set MACOS_RUNNER_TAG=saas-macos-medium-m1 and add `image: macos-15-xcode-16` under `default`.
 
-stages: [test, package]
+stages: [lint, test, package]
 
 variables:
   MACOS_RUNNER_TAG: macos
@@ -18,8 +18,20 @@ workflow:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
+lint:
+  stage: lint
+  tags: []              # any runner, Linux is fine
+  image: python:3.12-slim
+  script:
+    - ./scripts/lint.sh
+
 test:
   stage: test
+  # Needs a macOS runner. Until one exists, run it by hand from the pipeline page.
+  rules:
+    - if: $MACOS_RUNNER_AVAILABLE == "true"
+    - when: manual
+      allow_failure: true
   script:
     - swift --version
     - swift test
@@ -34,6 +46,8 @@ package:
   stage: package
   rules:
     - if: $CI_COMMIT_TAG =~ /^v\d+/
+      when: manual
+      allow_failure: true
   script:
     # Optional: set SIGN_IDENTITY and NOTARY_PROFILE (masked/protected CI variables) for a signed, notarized dmg.
     - VERSION="${CI_COMMIT_TAG#v}" BUILD_NUMBER="$CI_PIPELINE_IID" ./scripts/package.sh

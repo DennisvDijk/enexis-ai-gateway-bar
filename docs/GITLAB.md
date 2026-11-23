@@ -12,6 +12,11 @@ The app uses SwiftUI and AppKit, so it can only be built and tested on **macOS**
    ```
 4. Run it as a logged-in user (the UI tests host views in a window, which needs a GUI session). Enable auto-login for that user on a headless Mac.
 
+## Without a Mac runner (Linux only)
+The pipeline still works: the `lint` job runs on any Linux runner (`python:3.12-slim`, no Swift) via `scripts/lint.sh`. It checks the mock gateway, the shell scripts and the links in the docs. The `test` and `package` jobs are manual and non-blocking until a Mac runner exists. Once it does, set the CI variable `MACOS_RUNNER_AVAILABLE=true` and the test job runs automatically.
+
+`lint` is a safety net, not a replacement: it does not build the app or run the UI tests.
+
 ## What the pipeline does
 - `test`: `swift test`, `swift run UICheck`, `./build.sh`, signature check.
 - `package` (on tag `vX.Y.Z`): builds a dmg and zip. Add `SIGN_IDENTITY` and `NOTARY_PROFILE` as masked and protected variables for a signed, notarized build; the certificate must be in the keychain of the runner Mac.
