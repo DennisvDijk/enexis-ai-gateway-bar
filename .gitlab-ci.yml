@@ -1,15 +1,15 @@
-# GitLab CI for the macOS menu bar app. Needs a macOS runner.
-# GitLab.com: SaaS macOS runners (Premium/Ultimate), tag below. Self-managed: a Mac runner registered with tag `macos`.
-# Override the tag via the CI/CD variable MACOS_RUNNER_TAG.
+# GitLab CI for the macOS menu bar app.
+# Needs a macOS runner: the app uses SwiftUI/AppKit, so Linux runners cannot build or test it.
+# Self-managed GitLab: register a Mac with the shell executor and tag `macos` (see docs/GITLAB.md).
+# GitLab.com SaaS: set MACOS_RUNNER_TAG=saas-macos-medium-m1 and MACOS_IMAGE=macos-15-xcode-16.
 
 stages: [test, package]
 
 variables:
-  MACOS_RUNNER_TAG: saas-macos-medium-m1
+  MACOS_RUNNER_TAG: macos
 
 default:
   tags: [$MACOS_RUNNER_TAG]
-  image: macos-15-xcode-16
   interruptible: true
 
 workflow:

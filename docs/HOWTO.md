@@ -39,4 +39,4 @@ Certificate and notarization: see [DEPLOYMENT.md](DEPLOYMENT.md).
 Details: [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Move to GitLab
-Push to the GitLab remote. `.gitlab-ci.yml` runs the tests, the UI tests and the build. You need a macOS runner (GitLab SaaS Premium, or your own Mac; set its tag in `MACOS_RUNNER_TAG`).
+Push to the GitLab remote and register a Mac as a runner: see [GITLAB.md](GITLAB.md).

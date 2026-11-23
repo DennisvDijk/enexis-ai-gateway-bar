@@ -51,7 +51,7 @@ Known limits: not notarized, no auto-update. "Unavailable" detection needs `back
 
 ## CI and releases
 - **GitHub Actions:** `ci.yml` runs unit tests, UI tests, the build and a signature check on every push and PR. `release.yml` builds a dmg and zip when you push a tag like `v1.0.0`.
-- **GitLab:** `.gitlab-ci.yml` runs the same steps. It needs a macOS runner (tag in `MACOS_RUNNER_TAG`). It has not been run yet.
+- **GitLab:** `.gitlab-ci.yml` runs the same steps. It needs a macOS runner, even on self-managed GitLab: see [docs/GITLAB.md](docs/GITLAB.md). It has not been run yet.
 
 ## Documentation
 - [How it works](docs/ARCHITECTURE.md): components, one refresh cycle, states.
