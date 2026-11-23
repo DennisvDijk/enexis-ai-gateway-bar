@@ -1,7 +1,7 @@
 # GitLab CI for the macOS menu bar app.
 # Needs a macOS runner: the app uses SwiftUI/AppKit, so Linux runners cannot build or test it.
 # Self-managed GitLab: register a Mac with the shell executor and tag `macos` (see docs/GITLAB.md).
-# GitLab.com SaaS: set MACOS_RUNNER_TAG=saas-macos-medium-m1 and MACOS_IMAGE=macos-15-xcode-16.
+# GitLab.com SaaS: set MACOS_RUNNER_TAG=saas-macos-medium-m1 and add `image: macos-15-xcode-16` under `default`.
 
 stages: [test, package]
 
