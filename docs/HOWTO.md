@@ -1,39 +1,42 @@
-# How-to's
+# How-tos
 
-## Als gebruiker
-**Installeren:** zet `GatewayBar.app` in `/Applications` en open hem. Eerste keer: rechtsklik, Open (ad-hoc getekend, tot er een Developer ID is).
+## As a user
+**Install:** put `GatewayBar.app` in `/Applications` and open it. First time: right-click, Open (ad-hoc signed until a Developer ID exists).
 
-**Instellen:** klik het icoon, tandwiel, vul gateway-URL en je eigen key in, Bewaar. De key gaat in de Keychain.
+**Set up:** click the icon, then the gear, enter the gateway URL and your own key, save. The key goes into the Keychain.
 
-**Menubalk aanpassen:** Instellingen, Stijl: bedrag, percentage, beide of alleen icoon.
+**Change the menu bar text:** Settings, style: amount, percentage, both, or icon only.
 
-**Icoon niet te zien:** menubalk vol of verborgen door Ice/Bartender. Open de app opnieuw via Spotlight: het dashboard opent in een gewoon venster.
+**Icon not visible:** the menu bar is full or hidden by Ice/Bartender. Open the app again from Spotlight: the dashboard opens in a normal window.
 
-**Maand toont "–":** je key heeft geen admin-rechten. Normaal.
+**Month shows "–":** your key has no admin rights. This is expected.
 
-**Model staat nooit op "niet beschikbaar":** de gateway moet `background_health_checks` aan hebben.
+**A model never shows "unavailable":** the gateway needs `background_health_checks` enabled.
 
-## Als ontwikkelaar
+## As a developer
 ```sh
-swift run UICheck     # alle UI-tests, ook zonder Xcode
-swift test            # unit tests (Xcode nodig)
-python3 mock/server.py & ./build.sh && open GatewayBar.app   # tegen nep-gateway (poort 4000)
-./build.sh install    # naar /Applications
+swift run UICheck                                          # all UI tests, no Xcode needed
+swift test                                                 # unit tests (needs Xcode)
+python3 mock/server.py & ./build.sh && open GatewayBar.app # try it against the fake gateway
+./build.sh install                                         # copy to /Applications
 ```
-**Nieuwe check toevoegen:** `Sources/UICheck/main.swift`. Maak een `Gateway(...)` met de gewenste data, `install()`, laad `MenuView`, en test met `screen.texts()` en `screen.press(id:)`.
-**Nieuw element testbaar maken:** geef het een `.accessibilityIdentifier("naam")` in `Views.swift`.
+**Add a check:** edit `Sources/UICheck/main.swift`. Build a `Gateway(...)` with the data you want, call `install()`, load `MenuView`, then assert with `screen.texts()` and `screen.press(id:)`.
 
-## Releasen
-1. Zet `CHANGELOG.md` goed.
+**Make an element testable:** give it `.accessibilityIdentifier("name")` in `Views.swift`.
+
+## Release
+1. Update `CHANGELOG.md`.
 2. `git tag v1.1.0 && git push origin v1.1.0`
-3. De pipeline test, bouwt, tekent en publiceert dmg/zip/SHA256SUMS (GitHub Release).
-Certificaat en notarization: zie [DEPLOYMENT.md](DEPLOYMENT.md).
+3. The pipeline tests, builds, signs and publishes dmg, zip and SHA256SUMS (GitHub Release).
 
-## Uitrollen naar Enexis (IT)
-1. Developer ID + notarization regelen, bundle-id naar `nl.enexis.aigatewaybar`.
-2. Pakket in Jamf/Intune.
-3. Configuratieprofiel met `baseURL`, `interval`, `alertAt` voorinvullen.
+Certificate and notarization: see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+## Roll out to Enexis (IT)
+1. Get a Developer ID and notarization; change the bundle id to `nl.enexis.aigatewaybar`.
+2. Package it in Jamf or Intune.
+3. Push a configuration profile that presets `baseURL`, `interval` and `alertAt`.
+
 Details: [DEPLOYMENT.md](DEPLOYMENT.md).
 
-## Naar GitLab
-Push naar de GitLab-remote. `.gitlab-ci.yml` draait test, UI-tests en build. Nodig: een macOS-runner (SaaS Premium of eigen Mac, tag in `MACOS_RUNNER_TAG`).
+## Move to GitLab
+Push to the GitLab remote. `.gitlab-ci.yml` runs the tests, the UI tests and the build. You need a macOS runner (GitLab SaaS Premium, or your own Mac; set its tag in `MACOS_RUNNER_TAG`).

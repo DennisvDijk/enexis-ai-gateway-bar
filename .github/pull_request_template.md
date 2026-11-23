@@ -1,6 +1,7 @@
-## Wat verandert er
+## What changes
 
-## Hoe getest
+## How it was tested
 
 - [ ] `swift test`
-- [ ] `./build.sh` en app gestart
+- [ ] `swift run UICheck`
+- [ ] `./build.sh` and the app started

@@ -1,12 +1,12 @@
 # Changelog
 
-Volgt [Semantic Versioning](https://semver.org). Tags `vX.Y.Z` bouwen een release.
+Follows [Semantic Versioning](https://semver.org). Tags `vX.Y.Z` build a release.
 
 ## [Unreleased]
 
-### Toegevoegd
-- Menubalk-app "Enexis AI Gateway": spend, budget (periode uit de gateway) en modelbeschikbaarheid
-- Enexis-huisstijl, statusstipje op het icoon, compacte menubalktekst (bedrag / % / icoon)
-- Dashboard in een gewoon venster bij opnieuw openen van de app (als de menubalk vol zit)
-- UI-tests (`swift run UICheck`, 94 checks): elke staat van de popover, knoppen, instellingen en menubalktitel, tegen een nep-gateway
-- Tests, CI voor GitHub Actions en GitLab, release-pipeline (dmg, optioneel notarized)
+### Added
+- Menu bar app "Enexis AI Gateway": spend, budget (period taken from the gateway) and model availability
+- Enexis styling, status dot on the icon, compact menu bar text (amount / % / icon)
+- Dashboard in a normal window when the app is reopened (for a full menu bar)
+- UI tests (`swift run UICheck`, 94 checks): every popover state, the buttons, settings and the menu bar title, against a fake gateway
+- Unit tests, CI for GitHub Actions and GitLab, release pipeline (dmg, optionally notarized)

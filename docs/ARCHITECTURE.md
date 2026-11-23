@@ -1,45 +1,41 @@
-# Hoe het werkt
+# How it works
 
-![Architectuur](architecture.svg)
+![Architecture](architecture.svg)
 
-## Onderdelen
-| Onderdeel | Doel |
+## Components
+| Part | Purpose |
 |---|---|
-| `Sources/GatewayBar` | Dunne app: menubalk-item, venster bij heropenen. Bevat bijna geen logica. |
-| `Sources/GatewayBarKit` | Alle logica en views: `Store` (status, timer, meldingen), `Client` (HTTP), `Views`, `Keychain`. |
-| `Sources/UICheck` | UI-tests zonder Xcode: laadt de echte views, leest de accessibility-tree, drukt op knoppen, nep-gateway. |
-| `Tests/GatewayBarTests` | Unit tests (XCTest, draaien in CI). |
-| `mock/server.py` | Nep-gateway voor handmatig proberen (poort 4000). |
+| `Sources/GatewayBar` | Thin app: the menu bar item and the window on reopen. Almost no logic. |
+| `Sources/GatewayBarKit` | All logic and views: `Store` (state, timer, notifications), `Client` (HTTP), `Views`, `Keychain`. |
+| `Sources/UICheck` | UI tests without Xcode: loads the real views, reads the accessibility tree, presses buttons, uses a stub gateway. |
+| `Tests/GatewayBarTests` | Unit tests (XCTest, run in CI). |
+| `mock/server.py` | Fake gateway for manual testing (port 4000). |
 
-## Eén verversing (elke 60 s, minimaal 15 s)
-1. `/v1/models` voor de lijst, met `healthy_only` voor wat werkt. Verschil = niet beschikbaar.
-2. `/health/liveliness` bepaalt of de gateway zelf bereikbaar is.
-3. `/key/info` geeft uitgaven en budget van je key (wekelijks $120 komt hieruit); zonder budget valt de app terug op `/team/info`.
-4. `/spend/logs/v2` geeft vandaag en per model. Maandtotaal vraagt admin-rechten, anders staat er "–".
-5. `Store` zet dit om naar één `badge` (ok, waarschuwing, offline, key geweigerd) en een titel. De menubalk en het venster lezen alleen die status.
-6. Budget over de drempel, of model erbij/weg/uit/terug: macOS-melding.
+## One refresh (every 60 s, minimum 15 s)
+1. `/v1/models` lists the models; with `healthy_only` it lists the working ones. The difference is "unavailable".
+2. `/health/liveliness` tells whether the gateway itself is reachable.
+3. `/key/info` returns spend and budget for your key (the weekly $120 comes from here). Without a budget the app falls back to `/team/info`.
+4. `/spend/logs/v2` gives today's spend and spend per model. The month total needs admin rights; otherwise it shows "–".
+5. `Store` turns this into one `badge` (ok, warning, offline, key rejected) and a title. The menu bar and the window only read that state.
+6. Budget over the threshold, or a model added, removed, down or back up, triggers a macOS notification.
 
-## Instellingen
-- URL, interval, drempel, stijl: UserDefaults (domein `nl.gatewaybar.app`). Een MDM-profiel wint van de gebruiker.
-- API-key: macOS Keychain, nooit in een bestand.
+## Settings
+- URL, interval, threshold, style: UserDefaults (domain `nl.gatewaybar.app`). An MDM profile overrides the user's values.
+- API key: macOS Keychain, never in a file.
 
-## Statussen
+## States
 ```mermaid
 flowchart LR
-  A[Niet ingesteld] -->|URL + key| B[Verversen]
-  B -->|401/403| C[Key geweigerd]
-  B -->|geen verbinding| D[Offline]
-  B -->|alles ok| E[Gezond]
-  B -->|model uit| F[Waarschuwing]
-  B -->|budget > drempel| F
+  A[Not configured] -->|URL + key| B[Refreshing]
+  B -->|401/403| C[Key rejected]
+  B -->|no connection| D[Offline]
+  B -->|all fine| E[Healthy]
+  B -->|model down| F[Warning]
+  B -->|budget over threshold| F
 ```
 
-## Wat is getest en wat niet
-| Functie | Status |
-|---|---|
-| Weergave van alle statussen, knoppen, instellingen | UI-tests (CI) |
-| Budget, percentage, teambudget-terugval | UI- en unit tests |
-| Meldingen (budget 80%/100%, model erbij/weg/uit/terug) | Logica aanwezig, **niet getest**; verstuurt alleen vanuit een echte `.app` met bundle-id |
-| "Start bij inloggen" | Code aanwezig, niet getest |
-| Echte Enexis-gateway | Nog nooit gedraaid |
-| Echte muisklik in de menubalk | Niet geautomatiseerd |
+## Testing approach
+Without Xcode there is no UI-test framework, so `UICheck` hosts the real SwiftUI views in an offscreen window, switches accessibility on, reads the accessibility tree and presses buttons with `accessibilityPerformPress`. A `URLProtocol` stub plays the gateway. The same checks run locally, on GitHub and on GitLab.
+
+## What is tested and what is not
+See the table in the [README](../README.md#what-works-what-is-tested).
